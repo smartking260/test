@@ -1,0 +1,159 @@
+import 'package:flutter/material.dart';
+
+class CustomInputBorder extends InputBorder {
+  const CustomInputBorder({
+    super.borderSide = const BorderSide(),
+    this.borderRadius = const BorderRadius.all(Radius.circular(4.0)),
+    this.gapPadding = 4.0,
+  })  : assert(gapPadding >= 0.0);
+
+  final double gapPadding;
+
+  final BorderRadius borderRadius;
+
+  @override
+  bool get isOutline => true;
+
+  @override
+  CustomInputBorder copyWith({
+    BorderSide? borderSide,
+    BorderRadius? borderRadius,
+    double? gapPadding,
+  }) {
+    return CustomInputBorder(
+      borderSide: borderSide ?? this.borderSide,
+      borderRadius: borderRadius ?? this.borderRadius,
+      gapPadding: gapPadding ?? this.gapPadding,
+    );
+  }
+
+  @override
+  EdgeInsetsGeometry get dimensions {
+    return EdgeInsets.all(borderSide.width);
+  }
+
+  @override
+  CustomInputBorder scale(double t) {
+    return CustomInputBorder(
+      borderSide: borderSide.scale(t),
+      borderRadius: borderRadius * t,
+      gapPadding: gapPadding * t,
+    );
+  }
+
+  @override
+  ShapeBorder? lerpFrom(ShapeBorder? a, double t) {
+    if (a is CustomInputBorder) {
+      final CustomInputBorder outline = a;
+      return CustomInputBorder(
+        borderRadius: BorderRadius.lerp(outline.borderRadius, borderRadius, t)!,
+        borderSide: BorderSide.lerp(outline.borderSide, borderSide, t),
+        gapPadding: outline.gapPadding,
+      );
+    }
+    return super.lerpFrom(a, t);
+  }
+
+  @override
+  ShapeBorder? lerpTo(ShapeBorder? b, double t) {
+    if (b is CustomInputBorder) {
+      final CustomInputBorder outline = b;
+      return CustomInputBorder(
+        borderRadius: BorderRadius.lerp(borderRadius, outline.borderRadius, t)!,
+        borderSide: BorderSide.lerp(borderSide, outline.borderSide, t),
+        gapPadding: outline.gapPadding,
+      );
+    }
+    return super.lerpTo(b, t);
+  }
+
+  @override
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
+    return Path()
+      ..addRRect(borderRadius
+          .resolve(textDirection)
+          .toRRect(rect)
+          .deflate(borderSide.width));
+  }
+
+  @override
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
+    return Path()..addRRect(borderRadius.resolve(textDirection).toRRect(rect));
+  }
+
+  @override
+  void paintInterior(Canvas canvas, Rect rect, Paint paint,
+      {TextDirection? textDirection}) {
+    canvas.drawRRect(borderRadius.resolve(textDirection).toRRect(rect), paint);
+  }
+
+  @override
+  bool get preferPaintInterior => true;
+ Path _getPath(Canvas canvas,Size size){
+   Path path = Path();
+   path.moveTo(0, 0);
+   path.lineTo(size.width, 0);
+   path.lineTo(0, 0);
+   path.close();
+   path.moveTo(size.width, size.height * 0.8000000);
+   path.cubicTo(size.width, size.height * 0.9242650, size.width * 0.9862021,
+       size.height * 1.025000, size.width * 0.9691781, size.height * 1.025000);
+   path.lineTo(size.width * 0.03082192, size.height * 1.025000);
+   path.cubicTo(size.width * 0.01379945, size.height * 1.025000, 0,
+       size.height * 0.9242650, 0, size.height * 0.8000000);
+   path.cubicTo(
+       0,
+       size.height * 0.8966500,
+       size.width * 0.01226616,
+       size.height * 0.9750000,
+       size.width * 0.02739726,
+       size.height * 0.9750000);
+   path.lineTo(size.width * 0.9726027, size.height * 0.9750000);
+   path.cubicTo(size.width * 0.9877329, size.height * 0.9750000, size.width,
+       size.height * 0.8966500, size.width, size.height * 0.8000000);
+   path.close();
+   path.moveTo(0, size.height);
+   path.lineTo(0, 0);
+   path.lineTo(0, size.height);
+   path.close();
+   path.moveTo(size.width, 0);
+   path.lineTo(size.width, size.height);
+   path.lineTo(size.width, 0);
+   path.close();
+
+
+   return path;
+ }
+  @override
+  void paint(
+    Canvas canvas,
+    Rect rect, {
+    double? gapStart,
+    double gapExtent = 0.0,
+    double gapPercentage = 0.0,
+    TextDirection? textDirection,
+  }) {
+    var path = _getPath(canvas, rect.size);
+    Paint painter = Paint()..style = PaintingStyle.fill;
+    painter.color = const Color(0xffFF0000).withOpacity(1.0);
+    canvas.drawPath(path, painter);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is CustomInputBorder &&
+        other.borderSide == borderSide &&
+        other.borderRadius == borderRadius &&
+        other.gapPadding == gapPadding;
+  }
+
+  @override
+  int get hashCode => Object.hash(borderSide, borderRadius, gapPadding);
+}
+
